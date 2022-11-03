@@ -5,23 +5,23 @@ from bson.objectid import ObjectId
 from typing import TypeVar, Generic, List, get_origin, get_args
 import json
 
+
 T = TypeVar('T')
 
 class InterfaceRepositorio(Generic[T]):
-    #
-    def __int__(self):
+    def __init__(self):
         ca = certifi.where()
         dataConfig = self.loadFileConfig()
-        client = pymongo.MongoClient(dataConfig["data-db-connection"], tlsCAFile=ca)
+        client = pymongo.MongoClient(dataConfig["data-db-connection"],tlsCAFile=ca)
         self.baseDatos = client[dataConfig["name-db"]]
         theClass = get_args(self.__orig_bases__[0])
         self.coleccion = theClass[0].__name__.lower()
-    #
+
     def loadFileConfig(self):
         with open('config.json') as f:
             data = json.load(f)
-        return data
-    #
+            return data
+
     def findById(self, id):
         laColeccion = self.baseDatos[self.coleccion]
         x = laColeccion.find_one({"_id": ObjectId(id)})
@@ -31,7 +31,7 @@ class InterfaceRepositorio(Generic[T]):
         else:
             x["_id"] = x["_id"].__str__()
         return x
-    #
+
     def findAll(self):
         laColeccion = self.baseDatos[self.coleccion]
         data = []
@@ -41,7 +41,7 @@ class InterfaceRepositorio(Generic[T]):
             x = self.getValuesDBRef(x)
             data.append(x)
         return data
-    #
+
     def query(self, theQuery):
         laColeccion = self.baseDatos[self.coleccion]
         data = []
@@ -51,7 +51,7 @@ class InterfaceRepositorio(Generic[T]):
             x = self.getValuesDBRef(x)
             data.append(x)
         return data
-    #
+
     def queryAggregation(self, theQuery):
         laColeccion = self.baseDatos[self.coleccion]
         data = []
@@ -61,7 +61,7 @@ class InterfaceRepositorio(Generic[T]):
             x = self.getValuesDBRef(x)
             data.append(x)
         return data
-    #
+
     def getValuesDBRef(self, x):
         keys = x.keys()
         for k in keys:
@@ -76,7 +76,7 @@ class InterfaceRepositorio(Generic[T]):
             elif isinstance(x[k], dict):
                 x[k] = self.getValuesDBRef(x[k])
         return x
-    #
+
     def getValuesDBRefFromList(self, theList):
         newList = []
         laColeccion = self.baseDatos[theList[0]._id.collection]
@@ -85,7 +85,7 @@ class InterfaceRepositorio(Generic[T]):
             value["_id"] = value["_id"].__str__()
             newList.append(value)
         return newList
-    #
+
     def transformObjectIds(self, x):
         for attribute in x.keys():
             if isinstance(x[attribute], ObjectId):
@@ -95,16 +95,16 @@ class InterfaceRepositorio(Generic[T]):
             elif isinstance(x[attribute], dict):
                 x[attribute] = self.transformObjectIds(x[attribute])
         return x
-    #
+
     def formatList(self, x):
         newList = []
         for item in x:
             if isinstance(item, ObjectId):
                 newList.append(item.__str__())
-            if len(newList) == 0:
-                newList = x
+        if len(newList) == 0:
+            newList = x
         return newList
-    #
+
     def transformRefs(self, item):
         theDict = item.__dict__
         keys = list(theDict.keys())
@@ -113,11 +113,11 @@ class InterfaceRepositorio(Generic[T]):
                 newObject = self.ObjectToDBRef(getattr(item, k))
                 setattr(item, k, newObject)
         return item
-    #
+
     def ObjectToDBRef(self, item: T):
         nameCollection = item.__class__.__name__.lower()
         return DBRef(nameCollection, ObjectId(item._id))
-    #
+
     def save(self, item: T):
         laColeccion = self.baseDatos[self.coleccion]
         elId = ""
@@ -137,12 +137,12 @@ class InterfaceRepositorio(Generic[T]):
         x = laColeccion.find_one({"_id": ObjectId(elId)})
         x["_id"] = x["_id"].__str__()
         return self.findById(elId)
-    #
+
     def delete(self, id):
         laColeccion = self.baseDatos[self.coleccion]
         cuenta = laColeccion.delete_one({"_id": ObjectId(id)}).deleted_count
         return {"deleted_count": cuenta}
-    #
+
     def update(self, id, item: T):
         _id = ObjectId(id)
         laColeccion = self.baseDatos[self.coleccion]

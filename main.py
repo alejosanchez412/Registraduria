@@ -22,6 +22,7 @@ def test():
     json = {}
     json["message"]="Server running ..."
     return jsonify(json)
+
 #Carga el archivo json ,lo lee y lo resonator
 def loadFileConfig():
     with open('config.json') as f:
@@ -105,7 +106,7 @@ def modificarPartido(id):
     json = miControladorPartidos.update(id,data)
     return jsonify(json)
 
-@app.route("/partido/<string:id>",methods=['DELETE'])
+@app.route("/partidos/<string:id>",methods=['DELETE'])
 def eliminarPartido(id):
     json = miControladorPartidos.delete(id)
     return jsonify(json)
@@ -124,10 +125,10 @@ def getResultados():
     json = miControladorResultados.index()
     return jsonify(json)
 
-@app.route("/resultados/canditatos/<string:id_canditato>/mesas/<string:id_mesa>",methods=['POST'])
-def crearResultado(id_canditato, id_mesa):
+@app.route("/resultados/partidos/<string:id_partido>/mesas/<string:id_mesa>",methods=['POST'])
+def crearResultado(id_partido, id_mesa):
     data = request.get_json()
-    json = miControladorResultados.create(data, id_canditato, id_mesa)
+    json = miControladorResultados.create(data, id_partido, id_mesa)
     return jsonify(json)
 
 @app.route("/resultados/<string:id>",methods=['DELETE'])
@@ -142,15 +143,6 @@ def resultadosenMesas(id_mesa):
     return jsonify(json)
 
 #################################################################################################################
-
-
-
-
-# lee el archivo config.json
-def loadFileConfig():
-    with open('config.json') as f:
-        data = json.load(f)
-    return data
 
 if __name__=='__main__':
     dataConfig = loadFileConfig()
