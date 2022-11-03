@@ -1,32 +1,47 @@
+from Repositorios.ResultadosRepositorio import ResultadosRepositorio 
+from Repositorios.MesasRepositorio import MesasRopositorio
+from Repositorios.CandidatosRepositorio import CandidatosRepositorio
 from Modelos.Resultados import Resultados
-from Repositorios.ResultadosRepositorio import ResultadosRepositorio
+from Modelos.Mesas import Mesas
+from Modelos.Candidatos import Candidatos
 
 class ControladorResultados():
 
     def __init__(self):
-        self.resultadosRepositorio = ResultadosRepositorio()
+        self.relsutadorepositorio = ResultadosRepositorio()
+        self.candidatorepositorio = CandidatosRepositorio()
+        self.mesarepositorio = MesasRopositorio()
 
-    #Func para listar los Resultados
     def index(self):
-        return self.resultadosRepositorio.findAll()
+        return self.relsutadorepositorio.findAll()
 
-    #func para crear un estudiante
-    def create(self,elResultado):
-        elResultado = Resultados(elResultado)
-        return self.resultadosRepositorio.save(elResultado)
+#Asignacion estudiante y materia
+    def create(self, inforesultado, id_candidato, id_mesa):
+        nuevoResultado = Resultados(inforesultado)
+        elCandidato = Candidatos(self.candidatorepositorio.findById(id_candidato))
+        laMesa = Mesas(self.mesarepositorio.findById(id_mesa))
+        nuevoResultado.candidato = elCandidato
+        nuevoResultado.mesa = laMesa
+        return self.relsutadorepositorio.save(nuevoResultado)
 
-    #Funcion para mostrar un estudiante por id
-    def show(self,id):
-        elResultado = Resultados(self.resultadosRepositorio.findById(id))
+    def show(self, id):
+        elResultado = ResultadosRepositorio(self.relsutadorepositorio.findById(id))
         return elResultado.__dict__
 
-    #Func para actualizar un estudiante
-    def update(self, id, elResultado):
-        ResultadoActual = Resultados(self.resultadosRepositorio.findById(id))
-        ResultadoActual.numero_mesa = elResultado["numero_mesa"]
-        ResultadoActual.id_partido = elResultado["id_partido"]
-        return self.resultadosRepositorio.save(ResultadoActual)
 
-    #Func para eliminar un estudiante
+    def update(self, id, inforesultado, id_candidato, id_mesa):
+        elResultado = Resultados(self.relsutadorepositorio.findById(id))
+        elResultado.votos = inforesultado["votos"]
+        elResultado.candidato = inforesultado["candidato"]
+        elCandidato = Candidatos(self.candidatorepositorio.findById(id_candidato))
+        laMesa = Mesas(self.mesarepositorio.findById(id_mesa))
+        elResultado.candidato = elCandidato
+        elResultado.mesa = laMesa
+        return self.relsutadorepositorio.save(elResultado)
+
     def delete(self, id):
-        return self.resultadosRepositorio.delete(id)
+        return self.relsutadorepositorio.delete(id)
+
+    def listarResultadosEnMesas(self, id_mesa):
+        return self.relsutadorepositorio.getListadoResultadosEnMesas(id_mesa)
+    
