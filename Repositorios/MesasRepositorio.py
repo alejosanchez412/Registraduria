@@ -1,5 +1,5 @@
 from Repositorios.InterfaceRepositorio import InterfaceRepositorio
-from Modelos.Resultados import Resultados
+from Modelos.Mesas import Mesas
 
-class MesasRopositorio(InterfaceRepositorio[Resultados]):
+class MesasRopositorio(InterfaceRepositorio[Mesas]):
     pass

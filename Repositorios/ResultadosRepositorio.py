@@ -1,9 +1,8 @@
-from Repositorios.InterfaceRepositorio import InterfaceRepositorio
 from Modelos.Resultados import Resultados
+from Repositorios.InterfaceRepositorio import InterfaceRepositorio
+from bson import ObjectId
 
-class ResultadosRepositorio(InterfaceRepositorio[Resultados]):
-
-        def getListadoResultadosEnMesas(self, id_mesa):
-                theQuery = {"mesas.$id": ObjectId(id_mesa)}
-                return self.query(theQuery)
-
+class ResultadosRepositorios(InterfaceRepositorio[Resultados]):
+    def getlistResultadosCandidato(self,idC):
+        laquery = {"Candidato.$id": ObjectId(idC)}
+        return self.query(laquery)
